@@ -9,7 +9,7 @@ import bcrypt from 'bcrypt'
 let OTP, user;
 export const register = catchAsyncError(async(req, res, next)=>{
 
-    const {name, email, password } = req.body
+    const {name, email, password, role } = req.body
     if(!name || !email || !password) 
     return next(new customError("Please enter all details", 400))
 
@@ -32,8 +32,9 @@ export const register = catchAsyncError(async(req, res, next)=>{
     })
 
     //hashing password
-     const hashedPassword = await bcrypt.hash(password, 10)
-
+    const hashedPassword = await bcrypt.hash(password, 10)
+    
+    if(!role){
     user = new User({
         name,
         email, 
@@ -43,7 +44,18 @@ export const register = catchAsyncError(async(req, res, next)=>{
             url: "https://res.cloudinary.com/ddszevvis/image/upload/v1697807048/avatars/Default_Image_oz0haa.png",
           },
     })
-
+    } else {
+        user = new User({
+            name,
+            email, 
+            password: hashedPassword,
+            avatar: {
+                public_id: "",
+                url: "https://res.cloudinary.com/ddszevvis/image/upload/v1697807048/avatars/Default_Image_oz0haa.png",
+            },
+            role,
+        })
+    }
     res.status(200).json({
         success: true,
         message: `Otp sent to your email`,
@@ -83,12 +95,56 @@ export const logout = (req, res) =>{
 }
 
 export const getMyProfile = catchAsyncError(async(req, res, next)=>{
-
     const user = await User.findById(req.user);
     if(!user) next(new customError('User not found', 400))
 
     res.status(200).json({
         success: true,
         user,
+    })
+})
+
+export const editProfile = catchAsyncError(async(req, res, next)=>{
+     const user = await User.findById(req.user);
+     if(!user) next(new customError('User not found', 404))
+     
+     const {name, about, link} = req.body 
+
+     if(name){
+         user.name = name 
+     }
+     user.description = {
+        about,
+        link
+     }
+     
+     await user.save()
+     res.status(200).json({
+        success: true,
+        message: "Details Updated"
+    })
+})
+
+export const followUser = catchAsyncError(async(req, res, next)=>{
+
+    const userToFollow = await User.findById(req.params.id)
+    if(!userToFollow) next(new customError('User not found', 404))
+    
+    const user = await User.findById(req.user)
+
+    const isFollowed = user.followers.includes(userToFollow._id)
+
+    if(isFollowed){
+        user.followers = user.followers.filter((followedUserId) => followedUserId.toString() !== userToFollow._id)
+        userToFollow.following = userToFollow.following.filter((followingUserId) => followingUserId.toString() !== user._id) 
+    } else {
+        user.followers.unshift(userToFollow._id)
+        userToFollow.following.unshift(user._id)
+    }
+    
+    await user.save()
+    res.status(200).json({
+        success: true,
+        message: "Followed"
     })
 })

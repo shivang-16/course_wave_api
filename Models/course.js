@@ -33,14 +33,13 @@ const courseSchema = new Schema({
         review: String
     }
     ],
-
-    likes:[
+    views:[
         {
             type: Schema.Types.ObjectId,
             ref: "User"
         }
     ],
-
+    
     rating:[
         {
             type: Schema.Types.ObjectId,

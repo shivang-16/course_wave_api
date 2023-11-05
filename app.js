@@ -16,7 +16,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(cookieParser())
 
 app.use('/api/v1/user', userRouter)
-app.use('api/v1/course', courseRouter)
+app.use('/api/v1/course', courseRouter)
 
 app.get('/', (req, res)=>{
     res.send("Server is working fine")

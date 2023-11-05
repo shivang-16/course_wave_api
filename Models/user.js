@@ -20,25 +20,48 @@ const userSchema = new Schema({
         public_id: String,
         url: String
     },
+    description:{
+        about: String,
+        link: String,
+    },
     role:{
        type: String,
        enum: ["user", "admin"],
        default: "user"
     },
+    //for user
     playlist:[
-    {  
-        course:{
-                type: Schema.Types.ObjectId,
-                ref: "Course"
-        },
-        poster: String
-    }
+        {
+             type: Schema.Types.ObjectId,
+             ref: "Course"
+        }
     ], 
-
     cart:[
         {
             type: Schema.Types.ObjectId,
             ref: "Course"
+         }
+    ],
+    
+    //for admin 
+    mycourse: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Course"
+       }
+    ],
+
+    followers:[
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+         }
+    ],
+
+    following:[
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
          }
     ],
     

@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
 import customError from '../Utils/customError.js'
 import { User } from '../Models/user.js'
+import catchAsyncError from './catchAsyncError.js'
 
-const isAuthenticated = async(req, res, next) =>{
+export const isAuthenticated = catchAsyncError(async(req, res, next) =>{
     
     const {token} = req.cookies
     if(!token) return next(new customError("Login into your account first", 400))
@@ -11,6 +12,12 @@ const isAuthenticated = async(req, res, next) =>{
 
     req.user = await User.findById(decode._id)
     next()
-}
+})
 
-export default isAuthenticated
+export const authoriseAdmin = (req, res, next) =>{
+   
+    if(req.user.role !== 'admin')
+    return next(new customError("Access denied", 403))
+
+    next()
+}
