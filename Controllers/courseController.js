@@ -5,6 +5,7 @@ import customError from "../Utils/customError.js";
 import getDataUri from "../Utils/dataUri.js";
 import cloudinary from 'cloudinary'
 
+
 export const createCourse = catchAsyncError(async(req, res, next)=>{
 
     let {title, overview, price} = req.body
@@ -26,7 +27,6 @@ export const createCourse = catchAsyncError(async(req, res, next)=>{
         })
       }
 
-
       const course = await Course.create({
         title,
         description:{
@@ -35,7 +35,7 @@ export const createCourse = catchAsyncError(async(req, res, next)=>{
         },
         poster:{
             public_id: myCloud.public_id,
-            url: myCloud.url
+            url: myCloud.secure_url
         },
         owner: req.user
      }) 
@@ -49,6 +49,45 @@ export const createCourse = catchAsyncError(async(req, res, next)=>{
      res.status(201).json({
         success: true,
         message:"Yay! Course Created"
+     })
+})
+
+
+export const editCourse = catchAsyncError(async(req, res, next)=>{
+     
+    const course = await Course.findById(req.params.id)
+    if(!course) return next(new customError("Course not found", 404))
+
+    const {title, overview, price} = req.body
+    if(title || overview || price){
+        course.title = title,
+        course.description = {
+            overview,
+            price,
+        }
+    }
+
+    const file = req.file
+    if(file){
+        if(course.poster && course.poster.public_id){
+            await cloudinary.v2.uploader.destroy(course.poster.public_id)
+        }
+        
+        const fileUri = await getDataUri(file)
+        const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
+            folder: "Course_Poster"
+        })
+      
+        course.poster = {
+             public_id: myCloud.public_id,
+             url: myCloud.secure_url
+        }
+    }
+
+     await course.save()
+     res.status(200).json({
+        success: true,
+        message: "Course Updated"
      })
 })
 
@@ -74,3 +113,4 @@ export const addToCart = catchAsyncError(async(req, res, next) =>{
         message: isAdded ? "Removed from cart" : "Added to cart"
      })
 })
+

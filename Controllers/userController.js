@@ -5,6 +5,8 @@ import catchAsyncError from "../Middlewares/catchAsyncError.js";
 import sendMail from "../Utils/sendEmail.js";
 import sendCookie from "../Utils/sendCookie.js";
 import bcrypt from 'bcrypt'
+import cloudinary from 'cloudinary'
+import getDataUri from "../Utils/dataUri.js";
 
 let OTP, user;
 export const register = catchAsyncError(async(req, res, next)=>{
@@ -105,25 +107,60 @@ export const getMyProfile = catchAsyncError(async(req, res, next)=>{
 })
 
 export const editProfile = catchAsyncError(async(req, res, next)=>{
+
+    const {name, about, location, link} = req.body 
+
      const user = await User.findById(req.user);
      if(!user) next(new customError('User not found', 404))
-     
-     const {name, about, link} = req.body 
+   
 
      if(name){
          user.name = name 
      }
-     user.description = {
-        about,
-        link
-     }
-     
+
+     if(about || location || link) {
+        user.description = {
+          about: about || "",
+          location: location || "",
+          link: link || "",
+        };
+      } else {
+        // If no description data is provided in req.body, remove the description
+        user.description = {
+          about: "",
+          dob: "",
+          location: "",
+          link: "",
+        };
+      }
+  
+      const file = req.file;
+      if(file) {
+        // Destroy the existing avatar on Cloudinary if it exists
+        if (user.avatar && user.avatar.public_id) {
+          await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
+  
+        const fileUri = await getDataUri(file);
+        // Upload the new avatar to Cloudinary
+        const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
+          folder: "course_wave_avatars",
+        });
+  
+        user.avatar = {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        };
+      }
+
      await user.save()
+
      res.status(200).json({
         success: true,
         message: "Details Updated"
     })
 })
+
 
 export const followUser = catchAsyncError(async(req, res, next)=>{
 
@@ -131,7 +168,6 @@ export const followUser = catchAsyncError(async(req, res, next)=>{
     if(!userToFollow) next(new customError('User not found', 404))
     
     const user = await User.findById(req.user)
-
     const isFollowed = user.followers.includes(userToFollow._id)
 
     if(isFollowed){

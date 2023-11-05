@@ -22,6 +22,7 @@ const userSchema = new Schema({
     },
     description:{
         about: String,
+        location: String,
         link: String,
     },
     role:{
