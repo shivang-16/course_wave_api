@@ -11,6 +11,10 @@ const courseSchema = new Schema({
         public_id: String,
         url: String,
     },
+    course:{
+         type:  Schema.Types.ObjectId,
+         ref: "Course"
+    },
     views:[
         {
             type: Schema.Types.ObjectId,

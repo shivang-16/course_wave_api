@@ -26,8 +26,8 @@ const courseSchema = new Schema({
     ],
     lectures:[
         {
-        type: Schema.Types.ObjectId,
-        ref: "Lecture"
+            type: Schema.Types.ObjectId,
+            ref: "Lecture"
         }
    ],
     reviews:[
@@ -37,7 +37,7 @@ const courseSchema = new Schema({
           ref: "User"
         },
         review: String
-    }
+       }
     ],    
     rating:[
         {
