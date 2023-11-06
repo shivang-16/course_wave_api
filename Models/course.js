@@ -8,6 +8,10 @@ const courseSchema = new Schema({
     },
     description:{
         overview: String,
+        category: {
+          type: String,
+          required: [true,"Please enter the category of the course"]
+        },
         price: Number,
     },
     poster:{
@@ -36,16 +40,10 @@ const courseSchema = new Schema({
           type: Schema.Types.ObjectId,
           ref: "User"
         },
-        review: String
+        review: String,
+        rating: Number,
        }
-    ],    
-    rating:[
-        {
-            type: Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ],
-
+    ], 
     createdAt:{
         type: Date,
         default: Date.now,

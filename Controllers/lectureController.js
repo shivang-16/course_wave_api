@@ -99,9 +99,28 @@ export const likeLecture = catchAsyncError(async(req, res, next)=>{
         lecture.likes.unshift(user._id)
     }
 
-    await user.save()
+    await lecture.save()
     res.status(200).json({
         success: true,
         message: isLiked ? "Lecture Unliked" : "Lecture Liked"
     })
 })
+
+export const getLecturebById = catchAsyncError(async(req, res, next)=>{
+     
+    const lecture = await Lecture.findById(req.params.lectureId)
+    if(!lecture) next(new customError("Lecture not found", 404))
+
+    const user = await User.findById(req.user)
+
+    lecture.views.push(user._id)
+    await lecture.save()
+
+    res.status(200).json({
+        success: true,
+        message: 'New Viewer',
+        lecture,
+    })
+
+})
+

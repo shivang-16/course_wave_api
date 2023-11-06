@@ -115,3 +115,34 @@ export const addToCart = catchAsyncError(async(req, res, next) =>{
      })
 })
 
+
+export const addReview = catchAsyncError(async(req, res, next)=>{
+    
+      const {review, rating} = req.body
+      let course = await Course.findById(req.params.courseId)
+      if(!course) next(new customError("Course not found", 404))
+
+      course.reviews = [
+         {
+            user: req.user,
+            review,
+            rating
+         }
+      ]
+
+      await course.save()
+
+      res.status(200).json({
+        success: true,
+        message: "Review posted"
+      })
+})
+
+// export const deleteReview = catchAsyncError(async(req, res, next)=>{
+      
+//     let course = await Course.findById(req.params.courseId)
+//     if(!course) next(new customError("Course not found", 404))
+
+
+
+// })
