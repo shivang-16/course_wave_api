@@ -2,6 +2,7 @@ import express from "express";
 import errorMiddleware from "./Middlewares/error.js";
 import userRouter from './Routes/userRoutes.js'
 import courseRouter from './Routes/courseRoutes.js'
+import lectureRouter from './Routes/lectureRoutes.js'
 import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 
@@ -17,6 +18,7 @@ app.use(cookieParser())
 
 app.use('/api/v1/user', userRouter)
 app.use('/api/v1/course', courseRouter)
+app.use('/api/v1/lecture', lectureRouter)
 
 app.get('/', (req, res)=>{
     res.send("Server is working fine")

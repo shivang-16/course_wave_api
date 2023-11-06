@@ -9,7 +9,7 @@ const router = express.Router()
 
 //admin protected route
 router.post('/create', isAuthenticated, authoriseAdmin, singleUpload, createCourse)
-router.patch('/:id', isAuthenticated, authoriseAdmin, singleUpload, editCourse)
-router.get('/:id', isAuthenticated, addToCart)
+router.patch('/:courseId', isAuthenticated, authoriseAdmin, singleUpload, editCourse)
+router.get('/:courseId', isAuthenticated, addToCart)
 
 export default router

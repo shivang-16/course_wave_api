@@ -11,6 +11,6 @@ router.post('/login', login)
 router.get('/logout', logout)
 router.get('/me', isAuthenticated, getMyProfile)
 router.patch('/edit', isAuthenticated, singleUpload, editProfile)
-router.get('/follow/:id', isAuthenticated, followUser)
+router.get('/follow/:userId', isAuthenticated, followUser)
 
 export default router 

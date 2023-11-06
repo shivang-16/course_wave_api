@@ -108,7 +108,7 @@ export const getMyProfile = catchAsyncError(async(req, res, next)=>{
 
 export const editProfile = catchAsyncError(async(req, res, next)=>{
 
-    const {name, about, location, link} = req.body 
+     const {name, about, location, link} = req.body 
 
      const user = await User.findById(req.user);
      if(!user) next(new customError('User not found', 404))
@@ -164,23 +164,25 @@ export const editProfile = catchAsyncError(async(req, res, next)=>{
 
 export const followUser = catchAsyncError(async(req, res, next)=>{
 
-    const userToFollow = await User.findById(req.params.id)
+    const userToFollow = await User.findById(req.params.userId)
     if(!userToFollow) next(new customError('User not found', 404))
     
     const user = await User.findById(req.user)
-    const isFollowed = user.followers.includes(userToFollow._id)
+    const isFollowing = user.following.includes(userToFollow._id)
 
-    if(isFollowed){
-        user.followers = user.followers.filter((followedUserId) => followedUserId.toString() !== userToFollow._id)
-        userToFollow.following = userToFollow.following.filter((followingUserId) => followingUserId.toString() !== user._id) 
+    if(isFollowing){
+        user.following = user.following.filter((followedUserId) => followedUserId.toString() !== userToFollow._id.toString())
+        userToFollow.followers = userToFollow.followers.filter((followingUserId) => followingUserId.toString() !== user._id.toString()) 
     } else {
-        user.followers.unshift(userToFollow._id)
-        userToFollow.following.unshift(user._id)
+        user.following.unshift(userToFollow._id)
+        userToFollow.followers.unshift(user._id)
     }
     
     await user.save()
+    await userToFollow.save()
+
     res.status(200).json({
         success: true,
-        message: "Followed"
+        message: isFollowing ? "Unfollowed" : "Followed" 
     })
 })

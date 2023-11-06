@@ -1,5 +1,6 @@
 import { User } from "../Models/user.js";
 import { Course } from "../Models/course.js";
+import { Lecture } from "../Models/lecture.js";
 import catchAsyncError from "../Middlewares/catchAsyncError.js";
 import customError from "../Utils/customError.js";
 import getDataUri from "../Utils/dataUri.js";
@@ -55,7 +56,7 @@ export const createCourse = catchAsyncError(async(req, res, next)=>{
 
 export const editCourse = catchAsyncError(async(req, res, next)=>{
      
-    const course = await Course.findById(req.params.id)
+    const course = await Course.findById(req.params.courseId)
     if(!course) return next(new customError("Course not found", 404))
 
     const {title, overview, price} = req.body
@@ -93,7 +94,7 @@ export const editCourse = catchAsyncError(async(req, res, next)=>{
 
 export const addToCart = catchAsyncError(async(req, res, next) =>{
     
-    let course = await Course.findById(req.params.id);
+    let course = await Course.findById(req.params.courseId);
     if(!course) return next(new customError("Course not found", 404))
 
     let user = await User.findById(req.user)

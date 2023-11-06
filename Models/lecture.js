@@ -6,40 +6,18 @@ const courseSchema = new Schema({
         type: String,
         required: [true,"Please enter the title of the course"]
     },
-    description:{
-        overview: String,
-        price: Number,
-    },
-    poster:{
+    description: String,
+    video:{
         public_id: String,
         url: String,
     },
-    owner:{
-        type: Schema.Types.ObjectId,
-        ref: "User"
-    },
-    enrollments:[
+    views:[
         {
             type: Schema.Types.ObjectId,
             ref: "User"
         }
     ],
-    lectures:[
-        {
-        type: Schema.Types.ObjectId,
-        ref: "Lecture"
-        }
-   ],
-    reviews:[
-       {  
-        user:{
-          type: Schema.Types.ObjectId,
-          ref: "User"
-        },
-        review: String
-    }
-    ],    
-    rating:[
+    likes:[
         {
             type: Schema.Types.ObjectId,
             ref: "User"
@@ -52,4 +30,4 @@ const courseSchema = new Schema({
     }
 })
 
-export const Course = model("Course", courseSchema)
+export const Lecture = model("Lecture", courseSchema)
